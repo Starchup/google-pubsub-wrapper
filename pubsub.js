@@ -19,6 +19,8 @@ function init(projectId)
         projectId: projectId
     });
 
+    this.topics = {};
+
     return this;
 }
 
@@ -29,7 +31,7 @@ function emit(data, options)
         return Promise.reject(new Error('Publishing message requires options'));
     }
 
-    return findOrCreateTopic(this.pubsub, options).then(topic =>
+    return findOrCreateTopic(this.pubsub, this.topics, options).then(topic =>
     {
         return topic.publisher().publish(Buffer.from(JSON.stringify(data)), function (err, res)
         {
@@ -38,7 +40,7 @@ function emit(data, options)
     });
 }
 
-function findOrCreateTopic(pubsub, options)
+function findOrCreateTopic(pubsub, topics, options)
 {
     if (!pubsub)
     {
@@ -57,16 +59,16 @@ function findOrCreateTopic(pubsub, options)
         return Promise.reject(new Error('Topic creation requires env'));
     }
 
-    const topic = pubsub.topic([options.env, options.topicName].join(sep));
+    const topicName = [options.env, options.topicName].join(sep);
+    if (topics[topicName]) return Promise.resolve(topics[topicName]);
 
-    //Find or create topic
-    return topic.get(
+    return pubsub.topic(topicName).get(
     {
         autoCreate: true
-    }).then(topics =>
+    }).then(rawTopics =>
     {
-        //Google return format, always first index in array
-        return topics[0];
+        topics[topicName] = rawTopics[0];
+        return rawTopics[0];
     });
 }
 
@@ -115,7 +117,7 @@ function subscribe(options)
         return Promise.reject(new Error('Subscription requires pubsub client to be initialized'));
     }
 
-    return findOrCreateTopic(this.pubsub, options).then(topic =>
+    return findOrCreateTopic(this.pubsub, this.topics, options).then(topic =>
     {
         return createSubscription(topic, options);
     }).then(subscription =>
