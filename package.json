@@ -1,0 +1,22 @@
+{
+    "name": "google-pubsub-wrapper",
+    "version": "0.0.1",
+    "description": "Easy to use wrapper for Google pubsub",
+    "main": "pubsub.js",
+    "scripts":
+    {},
+    "repository":
+    {
+        "type": "git",
+        "url": "git+https://github.com/Starchup/google-pubsub-wrapper.git"
+    },
+    "keywords": [
+        "starchup"
+    ],
+    "author": "Starchup Inc",
+    "homepage": "https://github.com/Starchup/google-pubsub-wrapper#readme",
+    "dependencies":
+    {
+        "@google-cloud/pubsub": "0.18.0"
+    }
+}
