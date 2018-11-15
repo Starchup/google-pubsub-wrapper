@@ -1,6 +1,6 @@
 {
     "name": "google-pubsub-wrapper",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "Easy to use wrapper for Google pubsub",
     "main": "pubsub.js",
     "scripts":
@@ -17,6 +17,6 @@
     "homepage": "https://github.com/Starchup/google-pubsub-wrapper#readme",
     "dependencies":
     {
-        "@google-cloud/pubsub": "0.18.0"
+        "@google-cloud/pubsub": "0.21.1"
     }
 }
