@@ -1,6 +1,6 @@
 "use strict";
 
-const PubSub = require('@google-cloud/pubsub');
+const {PubSub} = require('@google-cloud/pubsub');
 
 const sep = '__';
 
@@ -14,7 +14,7 @@ function init(projectId)
 {
     if (!projectId) throw new Error('projectId is required');
 
-    this.pubsub = PubSub(
+    this.pubsub = new PubSub(
     {
         projectId: projectId
     });
