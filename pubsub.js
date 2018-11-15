@@ -1,6 +1,9 @@
 "use strict";
 
-const {PubSub} = require('@google-cloud/pubsub');
+const
+{
+    PubSub
+} = require('@google-cloud/pubsub');
 
 const sep = '__';
 
@@ -96,9 +99,12 @@ function createSubscription(topic, options)
     }
 
     const subscriptionName = [options.env, options.groupName, options.topicName].join(sep);
-    return topic.createSubscription(subscriptionName).then(subscriptions =>
+    return topic.subscription(subscriptionName).get(
     {
-        return subscriptions[0];
+        autoCreate: true
+    }).then((res) =>
+    {
+        return res[0];
     });
 }
 
