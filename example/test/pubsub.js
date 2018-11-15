@@ -4,7 +4,7 @@ var Pubsub = require('../../pubsub.js');
 var pubsubServer = Pubsub.init(process.env.GCLOUD_PROJECT);
 var pubsubClient = Pubsub.init(process.env.GCLOUD_PROJECT);
 
-describe('Test emitting & receiption', function ()
+describe('Test emitting & reception', function ()
 {
     var topicName = 'test';
     var env = 'testing';
