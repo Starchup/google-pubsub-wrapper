@@ -36,9 +36,16 @@ function emit(data, options)
 
     return findOrCreateTopic(this.pubsub, this.topics, options).then(topic =>
     {
-        return topic.publisher().publish(Buffer.from(JSON.stringify(data)), function (err, res)
+        return new Promise(function (resolve, reject)
         {
-            if (err) console.error(err);
+            topic.publisher().publish(Buffer.from(JSON.stringify(data)), function (err, res)
+            {
+                if (err) reject(err);
+                else resolve(res);
+            });
+        }).catch(function (err)
+        {
+            console.log(err.toString());
         });
     });
 }
