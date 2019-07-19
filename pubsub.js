@@ -149,8 +149,11 @@ function messageHandler(callback, message)
 
     var data = JSON.parse(message.data.toString('utf8'));
 
-    if (data.constructor !== Array) callback(data);
-    else data.forEach(callback);
+    if (data.constructor !== Array) callback(data, message.id);
+    else data.forEach(function (d)
+    {
+        callback(d, message.id);
+    });
 }
 
 function errorHandler(subscription, err)

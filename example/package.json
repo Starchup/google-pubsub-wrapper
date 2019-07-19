@@ -4,14 +4,11 @@
     "description": "Tests for google-pubsub-wrapper",
     "repository": "git@github.com:Starchup/google-pubsub-wrapper.git",
     "main": "example.js",
-    "dependencies":
-    {},
-    "scripts":
-    {
+    "dependencies": {},
+    "scripts": {
         "test": "mocha -t 20000 test/"
     },
-    "devDependencies":
-    {
+    "devDependencies": {
         "jshint": "2.9.4",
         "chai": "3.5.0",
         "mocha": "3.4.1"

@@ -1,6 +1,6 @@
 {
     "name": "google-pubsub-wrapper",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "Easy to use wrapper for Google pubsub",
     "main": "pubsub.js",
     "scripts":
