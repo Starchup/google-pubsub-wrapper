@@ -12,7 +12,7 @@ describe('Test emitting & reception', function ()
     var testVal = 'testVal';
 
     var globalCheck = false;
-    var callback = function (data, messageId)
+    var callback = function (data, publishTime)
     {
         globalCheck = data.testKey === testVal
     };

@@ -149,10 +149,10 @@ function messageHandler(callback, message)
 
     var data = JSON.parse(message.data.toString('utf8'));
 
-    if (data.constructor !== Array) callback(data, message.id);
+    if (data.constructor !== Array) callback(data, message.publishTime);
     else data.forEach(function (d)
     {
-        callback(d, message.id);
+        callback(d, message.publishTime);
     });
 }
 
