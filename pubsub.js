@@ -143,9 +143,12 @@ function subscribe(options)
     });
 }
 
-function messageHandler(callback, message, waitToAck)
+function messageHandler(callback, waitToAck, message)
 {
     var data = JSON.parse(message.data.toString('utf8'));
+
+    if (data.constructor !== Array) callback(data);
+    else data.forEach(callback);
 
     if (waitToAck)
     {
