@@ -135,7 +135,7 @@ function subscribe(options)
         return createSubscription(topic, options);
     }).then(subscription =>
     {
-        const msgHandler = messageHandler.bind(null, options.callback, options.waitToAck);
+        const msgHandler = messageHandler.bind(null, options.callback);
         const errHandler = errorHandler.bind(null, subscription);
 
         subscription.on('message', msgHandler);
@@ -143,37 +143,14 @@ function subscribe(options)
     });
 }
 
-function messageHandler(callback, waitToAck, message)
+function messageHandler(callback, message)
 {
+    message.ack();
+
     var data = JSON.parse(message.data.toString('utf8'));
 
     if (data.constructor !== Array) callback(data);
     else data.forEach(callback);
-
-    if (waitToAck)
-    {
-        if (data.constructor !== Array) callback(data, message.publishTime).then(function ()
-        {
-            message.ack();
-        });
-        else data.forEach(function (d)
-        {
-            callback(d, message.publishTime).then(function ()
-            {
-                message.ack();
-            });
-        });
-    }
-    else
-    {
-        message.ack();
-
-        if (data.constructor !== Array) callback(data, message.publishTime);
-        else data.forEach(function (d)
-        {
-            callback(d, message.publishTime);
-        });
-    }
 }
 
 function errorHandler(subscription, err)
