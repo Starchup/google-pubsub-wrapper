@@ -147,7 +147,7 @@ function messageHandler(callback, message)
 {
     message.ack();
 
-    if (!message || message.data) return callback();
+    if (!message || !message.data) return callback();
 
     var data = JSON.parse(message.data.toString('utf8'));
 
