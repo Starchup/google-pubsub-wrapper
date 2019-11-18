@@ -147,12 +147,14 @@ function messageHandler(callback, message)
 {
     message.ack();
 
-    if (!message || !message.data) return callback();
+    if (!message || !message.data) callback();
+    else
+    {
+        var data = JSON.parse(message.data.toString('utf8'));
 
-    var data = JSON.parse(message.data.toString('utf8'));
-
-    if (data.constructor !== Array) callback(data);
-    else data.forEach(callback);
+        if (data.constructor !== Array) callback(data);
+        else data.forEach(callback);
+    }
 }
 
 function errorHandler(subscription, err)
