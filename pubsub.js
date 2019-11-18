@@ -38,7 +38,7 @@ function emit(data, options)
     {
         return new Promise(function (resolve, reject)
         {
-            topic.publisher().publishJSON(data, function (err, res)
+            topic.publishJSON(data, function (err, res)
             {
                 if (err) reject(err);
                 else resolve(res);
