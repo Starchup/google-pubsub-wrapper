@@ -145,7 +145,7 @@ function subscribe(options)
 
 function messageHandler(callback, message)
 {
-    message.ack();
+    if (message) message.ack();
 
     if (!message || !message.data) callback();
     else
