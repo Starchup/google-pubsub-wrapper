@@ -38,14 +38,18 @@ function emit(data, options)
     {
         return new Promise(function (resolve, reject)
         {
-            topic.publishJSON(data, function (err, res)
+            try
             {
-                if (err) reject(err);
-                else resolve(res);
-            });
-        }).catch(function (err)
-        {
-            console.log(err.toString());
+                topic.publisher().publish(Buffer.from(JSON.stringify(data)), function (err, res)
+                {
+                    if (err) reject(err);
+                    else resolve(res);
+                });
+            }
+            catch (e)
+            {
+                reject(e);
+            }
         });
     });
 }
@@ -72,14 +76,21 @@ function findOrCreateTopic(pubsub, topics, options)
     const topicName = [options.env, options.topicName].join(sep);
     if (topics[topicName]) return Promise.resolve(topics[topicName]);
 
-    return pubsub.topic(topicName).get(
+    try
     {
-        autoCreate: true
-    }).then(rawTopics =>
+        return pubsub.topic(topicName).get(
+        {
+            autoCreate: true
+        }).then(rawTopics =>
+        {
+            topics[topicName] = rawTopics[0];
+            return rawTopics[0];
+        });
+    }
+    catch (err)
     {
-        topics[topicName] = rawTopics[0];
-        return rawTopics[0];
-    });
+        return Promise.reject(err)
+    }
 }
 
 function createSubscription(topic, options)
@@ -135,29 +146,44 @@ function subscribe(options)
         return createSubscription(topic, options);
     }).then(subscription =>
     {
-        const msgHandler = messageHandler.bind(null, options.callback);
+        const msgHandler = messageHandler.bind(null, options.callback, options.topicName);
         const errHandler = errorHandler.bind(null, subscription);
 
         subscription.on('message', msgHandler);
         subscription.on('error', errHandler);
+    }).catch(function (err)
+    {
+        console.error('google-pubsub-wrapper: subscribe error: ' + err.message);
+        throw err;
     });
 }
 
-function messageHandler(callback, message)
+function messageHandler(callback, topicName, message)
 {
-    if (message) message.ack();
-
-    if (!message || !message.data) callback();
-    else
+    try
     {
-        var data = JSON.parse(message.data.toString('utf8'));
+        if (!message) callback();
+        else if (!message.data)
+        {
+            message.ack();
+            callback();
+        }
+        else
+        {
+            message.ack();
 
-        if (data.constructor !== Array) callback(data);
-        else data.forEach(callback);
+            const data = JSON.parse(message.data.toString('utf8'));
+            if (data.constructor !== Array) callback(data);
+            else data.forEach(callback);
+        }
+    }
+    catch (err)
+    {
+        console.error('google-pubsub-wrapper: Error in messageHandler for topicName ' + topicName + ': ' + err.message);
     }
 }
 
 function errorHandler(subscription, err)
 {
-    console.error('Error for subscription ' + subscription.name + ': ' + err.message);
+    console.error('google-pubsub-wrapper: Error for subscription ' + subscription.name + ': ' + err.message);
 }
