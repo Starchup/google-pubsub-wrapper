@@ -165,8 +165,12 @@ function messageHandler(callback, topicName, message)
         if (message && message.ack) message.ack();
 
         if (!message || !message.data) callback();
-        else if (data.constructor !== Array) callback(data);
-        else data.forEach(callback);
+        else
+        {
+            const data = JSON.parse(message.data.toString('utf8'));
+            if (data.constructor !== Array) callback(data);
+            else data.forEach(callback);
+        }
     }
     catch (err)
     {
