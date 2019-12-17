@@ -162,20 +162,10 @@ function messageHandler(callback, topicName, message)
 {
     try
     {
-        if (!message) callback();
-        else if (!message.data)
-        {
-            message.ack();
-            callback();
-        }
-        else
-        {
-            message.ack();
+        if (message && message.ack) message.ack();
 
-            const data = JSON.parse(message.data.toString('utf8'));
-            if (data.constructor !== Array) callback(data);
-            else data.forEach(callback);
-        }
+        if (!message || !message.data) callback();
+        else callback(JSON.parse(message.data.toString('utf8')));
     }
     catch (err)
     {
