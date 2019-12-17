@@ -165,7 +165,8 @@ function messageHandler(callback, topicName, message)
         if (message && message.ack) message.ack();
 
         if (!message || !message.data) callback();
-        else callback(JSON.parse(message.data.toString('utf8')));
+        else if (data.constructor !== Array) callback(data);
+        else data.forEach(callback);
     }
     catch (err)
     {
