@@ -40,7 +40,7 @@ function emit(data, options)
         {
             try
             {
-                topic.publisher().publish(Buffer.from(JSON.stringify(data)), function (err, res)
+                topic.publishJSON(data, function (err, res)
                 {
                     if (err) reject(err);
                     else resolve(res);
@@ -117,7 +117,16 @@ function createSubscription(topic, options)
     }
 
     const subscriptionName = [options.env, options.groupName, options.topicName].join(sep);
-    return topic.subscription(subscriptionName).get(
+    return topic.subscription(subscriptionName,
+    {
+        batching:
+        {
+            callOptions:
+            {
+                timeout: 60000
+            }
+        }
+    }).get(
     {
         autoCreate: true
     }).then((res) =>
