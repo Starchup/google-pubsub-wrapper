@@ -17,6 +17,6 @@
     "homepage": "https://github.com/Starchup/google-pubsub-wrapper#readme",
     "dependencies":
     {
-        "@google-cloud/pubsub": "1.2.0"
+        "@google-cloud/pubsub": "1.5.0"
     }
 }
