@@ -165,22 +165,40 @@ function subscribe(options)
 
 function messageHandler(callback, topicName, message)
 {
-    try
+    if (!callback) callback = function ()
     {
-        if (message && message.ack) message.ack();
+        return Promise.resolve();
+    };
 
-        if (!message || !message.data) callback();
-        else
+    var prom;
+
+    if (!message || !message.data) prom = callback();
+    else try
+    {
+        const data = JSON.parse(message.data.toString('utf8'));
+        if (data.constructor !== Array) prom = callback(data);
+        else prom = data.reduce(function (prev, d, idx)
         {
-            const data = JSON.parse(message.data.toString('utf8'));
-            if (data.constructor !== Array) callback(data);
-            else data.forEach(callback);
-        }
+            return prev.then(function ()
+            {
+                return callback(d);
+            });
+        }, Promise.resolve());
     }
     catch (err)
     {
         console.error('google-pubsub-wrapper: Error in messageHandler for topicName ' + topicName + ': ' + err.message);
     }
+
+    prom.then(function ()
+    {
+        if (message.ack) message.ack();
+    }).catch(function (err)
+    {
+        console.error('google-pubsub-wrapper: Error in messageHandler catch for topicName ' + topicName + ': ' + err.message);
+
+        if (message.ack) message.ack();
+    });
 }
 
 function errorHandler(subscription, err)
