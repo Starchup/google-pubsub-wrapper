@@ -13,6 +13,8 @@ module.exports = {
     subscribe: subscribe
 }
 
+const defaultAckDeadline = 300; // 5 minutes
+
 function init(projectId)
 {
     if (!projectId) throw new Error('projectId is required');
@@ -119,13 +121,7 @@ function createSubscription(topic, options)
     const subscriptionName = [options.env, options.groupName, options.topicName].join(sep);
     return topic.subscription(subscriptionName,
     {
-        batching:
-        {
-            callOptions:
-            {
-                timeout: 60000
-            }
-        }
+        ackDeadline: defaultAckDeadline
     }).get(
     {
         autoCreate: true
