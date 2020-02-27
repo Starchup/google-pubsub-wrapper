@@ -1,5 +1,6 @@
 "use strict";
 
+const grpc = require('grpc');
 const
 {
     PubSub
@@ -13,13 +14,16 @@ module.exports = {
     subscribe: subscribe
 }
 
+const defaultAckDeadline = 300; // 5 minutes
+
 function init(projectId)
 {
     if (!projectId) throw new Error('projectId is required');
 
     this.pubsub = new PubSub(
     {
-        projectId: projectId
+        projectId: projectId,
+        grpc: grpc
     });
 
     this.topics = {};
@@ -40,7 +44,7 @@ function emit(data, options)
         {
             try
             {
-                topic.publisher().publish(Buffer.from(JSON.stringify(data)), function (err, res)
+                topic.publishJSON(data, function (err, res)
                 {
                     if (err) reject(err);
                     else resolve(res);
@@ -117,7 +121,10 @@ function createSubscription(topic, options)
     }
 
     const subscriptionName = [options.env, options.groupName, options.topicName].join(sep);
-    return topic.subscription(subscriptionName).get(
+    return topic.subscription(subscriptionName,
+    {
+        ackDeadline: defaultAckDeadline
+    }).get(
     {
         autoCreate: true
     }).then((res) =>
@@ -160,22 +167,40 @@ function subscribe(options)
 
 function messageHandler(callback, topicName, message)
 {
-    try
+    if (!callback) callback = function ()
     {
-        if (message && message.ack) message.ack();
+        return Promise.resolve();
+    };
 
-        if (!message || !message.data) callback();
-        else
+    var prom;
+
+    if (!message || !message.data) prom = callback();
+    else try
+    {
+        const data = JSON.parse(message.data.toString('utf8'));
+        if (data.constructor !== Array) prom = callback(data);
+        else prom = data.reduce(function (prev, d, idx)
         {
-            const data = JSON.parse(message.data.toString('utf8'));
-            if (data.constructor !== Array) callback(data);
-            else data.forEach(callback);
-        }
+            return prev.then(function ()
+            {
+                return callback(d);
+            });
+        }, Promise.resolve());
     }
     catch (err)
     {
         console.error('google-pubsub-wrapper: Error in messageHandler for topicName ' + topicName + ': ' + err.message);
     }
+
+    prom.then(function ()
+    {
+        if (message.ack) message.ack();
+    }).catch(function (err)
+    {
+        console.error('google-pubsub-wrapper: Error in messageHandler catch for topicName ' + topicName + ': ' + err.message);
+
+        if (message.ack) message.ack();
+    });
 }
 
 function errorHandler(subscription, err)
