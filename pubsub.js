@@ -1,5 +1,6 @@
 "use strict";
 
+const grpc = require('grpc');
 const
 {
     PubSub
@@ -21,7 +22,8 @@ function init(projectId)
 
     this.pubsub = new PubSub(
     {
-        projectId: projectId
+        projectId: projectId,
+        grpc: grpc
     });
 
     this.topics = {};
