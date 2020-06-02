@@ -52,6 +52,7 @@ function emit(data, options)
             }
             catch (e)
             {
+                console.error(e);
                 reject(e);
             }
         });
@@ -194,6 +195,7 @@ function messageHandler(callback, topicName, message)
 
     prom.then(function ()
     {
+        console.debug('google-pubsub-wrapper handle: ' + topicName + ' with ack: ' + !!message.ack);
         if (message.ack) message.ack();
     }).catch(function (err)
     {
