@@ -38,6 +38,8 @@ function emit(data, options)
         return Promise.reject(new Error('Publishing message requires options'));
     }
 
+    console.debug('google-pubsub-wrapper emit: ' + JSON.stringify(options) + ' with data: ' + JSON.stringify(data));
+
     return findOrCreateTopic(this.pubsub, this.topics, options).then(topic =>
     {
         return new Promise(function (resolve, reject)
