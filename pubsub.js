@@ -127,10 +127,9 @@ function createSubscription(topic, options)
     return topic.subscription(subscriptionName,
     {
         ackDeadline: defaultAckDeadline,
-        timeout: 60000,
         streamingOptions:
         {
-            maxStreams: 1
+            maxStreams: 2
         }
     }).get(
     {
