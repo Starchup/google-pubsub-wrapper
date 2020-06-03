@@ -14,7 +14,9 @@ module.exports = {
     subscribe: subscribe
 }
 
-const defaultAckDeadline = 300; // 5 minutes
+const defaultAckDeadline = 60; // 1 minute
+const defaultSubscriptionConnectionTimeout = 300; // 5 minutes
+const maxPubsubStreamsPerSubscription = 2;
 
 function init(projectId)
 {
@@ -52,6 +54,7 @@ function emit(data, options)
             }
             catch (e)
             {
+                console.error(e);
                 reject(e);
             }
         });
@@ -123,7 +126,12 @@ function createSubscription(topic, options)
     const subscriptionName = [options.env, options.groupName, options.topicName].join(sep);
     return topic.subscription(subscriptionName,
     {
-        ackDeadline: defaultAckDeadline
+        ackDeadline: defaultAckDeadline,
+        timeout: defaultSubscriptionConnectionTimeout,
+        streamingOptions:
+        {
+            maxStreams: maxPubsubStreamsPerSubscription
+        }
     }).get(
     {
         autoCreate: true
