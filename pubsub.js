@@ -126,7 +126,12 @@ function createSubscription(topic, options)
     const subscriptionName = [options.env, options.groupName, options.topicName].join(sep);
     return topic.subscription(subscriptionName,
     {
-        ackDeadline: defaultAckDeadline
+        ackDeadline: defaultAckDeadline,
+        timeout: 60000,
+        streamingOptions:
+        {
+            maxStreams: 1
+        }
     }).get(
     {
         autoCreate: true
