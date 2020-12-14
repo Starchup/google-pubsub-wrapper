@@ -214,4 +214,5 @@ function messageHandler(callback, topicName, message)
 function errorHandler(subscription, err)
 {
     console.error('google-pubsub-wrapper: Error for subscription ' + subscription.name + ': ' + err.message);
+    throw err.message;
 }
