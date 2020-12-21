@@ -1,5 +1,3 @@
-
-
 google-pubsub-wraper
 ====================
 Easy to use wrapper for Google pubsub
